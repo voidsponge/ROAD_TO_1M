@@ -1,0 +1,23 @@
+# Déploiement complet sur un VPS : l'application + Caddy (HTTPS automatique).
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - appdata:/data
+    init: true
+    shm_size: 1gb
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    environment:
+      DOMAIN: ${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data
+    depends_on: [app]
+volumes:
+  appdata:
+  caddydata:
